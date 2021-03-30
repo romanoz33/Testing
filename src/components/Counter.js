@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Box } from '@quarkly/widgets';
 
 const elementInViewport = el => {
@@ -30,32 +30,23 @@ const Counter = ({
 	const [onView, setOnView] = useState(false);
 	const [currentNumber, setCurrentNumber] = useState(revers ? endingNumber : startingNumber);
 	const getDurationOneStep = useMemo(() => duration / (endingNumber - startingNumber), [duration, endingNumber, startingNumber]);
-
-	const setOnView2 = () => {
+	const checkOnView = useCallback(() => {
 		if (!onView) {
 			if (elementInViewport(refCounter.current)) {
 				setOnView(true);
-				window.removeEventListener('scroll', setOnView2);
+				window.removeEventListener('scroll', checkOnView);
 			}
 
 			;
 		}
 
 		;
-	}; // const setOnView2 = useCallback(() => {
-	//   if (!onView) { 
-	// 		if (elementInViewport(refCounter.current)) {
-	// 			setOnView(true);
-	// 			window.removeEventListener('scroll', setOnView2); 
-	// 		};
-	// 	};
-	// }, [onView]); 
-
-
+	}, [onView]);
 	useEffect(() => {
-		window.addEventListener('scroll', setOnView2);
+		checkOnView();
+		window.addEventListener('scroll', checkOnView);
 		return () => {
-			window.removeEventListener('scroll', setOnView2);
+			window.removeEventListener('scroll', checkOnView);
 		};
 	}, [refCounter.current]);
 	useEffect(() => {
